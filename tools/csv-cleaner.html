@@ -1,0 +1,181 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>CSV 清洗器 · 去重/去空行/统一日期 · 纯本地不上传</title>
+<meta name="description" content="粘贴 CSV 或 TSV，一键去重、去空行、去首尾空格、统一日期格式、按列去重，导出干净 CSV。全部在浏览器本地完成，数据不上传服务器。">
+<style>
+:root{--ink:#0f1720;--mut:#5b6b7c;--line:#e3e8ee;--acc:#1f4fd8;--ok:#137a4b;--warn:#b45309}
+*{box-sizing:border-box}
+body{margin:0;background:#f6f8fb;color:var(--ink);font:15px/1.6 -apple-system,'PingFang SC',system-ui,sans-serif}
+.wrap{max-width:900px;margin:0 auto;padding:36px 18px 80px}
+h1{font-size:26px;margin:0 0 6px;letter-spacing:-.02em}
+.sub{color:var(--mut);margin:0 0 22px}
+.panel{background:#fff;border:1px solid var(--line);border-radius:14px;padding:18px;margin-bottom:16px}
+label{display:block;font-size:13px;color:var(--mut);margin-bottom:6px;text-transform:uppercase;letter-spacing:.05em}
+textarea{width:100%;min-height:150px;border:1px solid var(--line);border-radius:10px;padding:12px;
+ font-family:ui-monospace,Menlo,monospace;font-size:13px;resize:vertical;background:#fbfcfe}
+.row{display:flex;gap:14px;flex-wrap:wrap;align-items:flex-end;margin-bottom:12px}
+.row>div{flex:1;min-width:140px}
+input[type=text],select{width:100%;border:1px solid var(--line);border-radius:9px;padding:9px 11px;font-size:14px;background:#fff}
+button{background:var(--acc);color:#fff;border:0;border-radius:9px;padding:10px 18px;font-size:14px;font-weight:600;cursor:pointer}
+button.ghost{background:#fff;color:var(--acc);border:1px solid var(--line)}
+button:hover{opacity:.92}
+.stats{display:flex;gap:18px;flex-wrap:wrap;font-size:14px;color:var(--mut);margin-top:12px}
+.stats b{color:var(--ink)}
+.ok{color:var(--ok);font-weight:600}
+pre{background:#0f1720;color:#dbe4ee;padding:14px;border-radius:10px;overflow:auto;font-size:12px;max-height:320px}
+.foot{margin-top:34px;color:var(--mut);font-size:13px;border-top:1px solid var(--line);padding-top:16px}
+a{color:var(--acc)}
+</style>
+</head>
+<body>
+<div class="wrap">
+<h1>CSV 清洗器</h1>
+<p class="sub">去重、去空行、去首尾空格、统一日期格式、按指定列去重，导出干净 CSV。<b>全部在浏览器里跑，数据不上传。</b></p>
+
+<div class="panel">
+  <label>把 CSV / TSV 粘进来（第一行是表头）</label>
+  <textarea id="src" placeholder="姓名,日期,金额,备注
+张三,2026/1/5,120.5, 首单
+李四,2026-01-06,88,补款
+张三,2026/1/5,120.5, 首单
+,,,
+王五,06/01/2026,45,"></textarea>
+  <div class="row" style="margin-top:12px">
+    <div><label>分隔符</label><select id="sep"><option value="auto">自动</option><option value=",">逗号 ,</option><option value="\t">制表符</option><option value=";">分号 ;</option></select></div>
+    <div><label>按哪列去重（留空=整行）</label><input type="text" id="keycol" placeholder="例如 姓名 或 1"></div>
+    <div><label>日期列（可留空）</label><input type="text" id="datecol" placeholder="例如 日期 或 2"></div>
+    <div><button id="run">清洗</button></div>
+  </div>
+  <div class="row">
+    <div><label><input type="checkbox" id="trim" checked style="width:auto"> 去首尾空格</label></div>
+    <div><label><input type="checkbox" id="empty" checked style="width:auto"> 删全空行</label></div>
+    <div><label><input type="checkbox" id="dedup" checked style="width:auto"> 去重复行</label></div>
+    <div><label><input type="checkbox" id="norm" checked style="width:auto"> 统一日期为 YYYY-MM-DD</label></div>
+  </div>
+  <div class="stats" id="stats"></div>
+</div>
+
+<div class="panel">
+  <label>结果（可直接复制，或点下载）</label>
+  <pre id="out">—</pre>
+  <div style="margin-top:12px;display:flex;gap:10px">
+    <button id="dl">下载 CSV</button>
+    <button class="ghost" id="copy">复制</button>
+  </div>
+</div>
+
+<div class="foot">
+  <p><b>为什么不上传？</b>清洗在你自己电脑的浏览器里完成，我没有服务器、也没有接收你数据的接口。断网也能用。</p>
+  <p>需要我帮你处理更复杂的表（多文件合并、按规则对账、跨表校验）？<a href="../index.html">看这里的服务清单</a>，按件报价，$6 起。</p>
+</div>
+</div>
+
+<script>
+function detectSep(t){
+  const first = t.split(/\r?\n/).find(l=>l.trim()) || '';
+  const counts = {',': (first.match(/,/g)||[]).length, '\t': (first.match(/\t/g)||[]).length, ';': (first.match(/;/g)||[]).length};
+  return Object.keys(counts).sort((a,b)=>counts[b]-counts[a])[0] || ',';
+}
+// 极简 CSV 解析：支持引号包裹与转义
+function parseCSV(text, sep){
+  const rows=[]; let row=[], cur='', q=false;
+  for(let i=0;i<text.length;i++){
+    const c=text[i];
+    if(q){
+      if(c==='"'){ if(text[i+1]==='"'){cur+='"';i++;} else q=false; }
+      else cur+=c;
+    } else {
+      if(c==='"') q=true;
+      else if(c===sep){ row.push(cur); cur=''; }
+      else if(c==='\n'){ row.push(cur); rows.push(row); row=[]; cur=''; }
+      else if(c==='\r'){ }
+      else cur+=c;
+    }
+  }
+  if(cur.length||row.length){ row.push(cur); rows.push(row); }
+  return rows;
+}
+function toCSV(rows, sep=","){
+  return rows.map(r=>r.map(v=>{
+    const s=String(v??'');
+    return (s.includes(sep)||s.includes('"')||s.includes('\n')) ? '"'+s.replace(/"/g,'""')+'"' : s;
+  }).join(sep)).join('\n');
+}
+function normDate(s){
+  s=String(s).trim();
+  let m;
+  if((m=s.match(/^(\d{4})[-\/.](\d{1,2})[-\/.](\d{1,2})$/))) return `${m[1]}-${String(m[2]).padStart(2,'0')}-${String(m[3]).padStart(2,'0')}`;
+  if((m=s.match(/^(\d{1,2})[-\/.](\d{1,2})[-\/.](\d{4})$/))) return `${m[3]}-${String(m[2]).padStart(2,'0')}-${String(m[1]).padStart(2,'0')}`;
+  if((m=s.match(/^(\d{4})年(\d{1,2})月(\d{1,2})日?$/))) return `${m[1]}-${String(m[2]).padStart(2,'0')}-${String(m[3]).padStart(2,'0')}`;
+  return null;
+}
+let lastRows=null;
+
+document.getElementById('run').onclick = () => {
+  const src=document.getElementById('src').value;
+  if(!src.trim()){ document.getElementById('out').textContent='（先把数据粘进来）'; return; }
+  let sep=document.getElementById('sep').value;
+  if(sep==='auto') sep=detectSep(src);
+  if(sep==='\\t') sep='\t';
+  let rows=parseCSV(src, sep);
+  const orig=rows.length;
+  const trim=document.getElementById('trim').checked,
+        dropEmpty=document.getElementById('empty').checked,
+        dedupe=document.getElementById('dedup').checked,
+        norm=document.getElementById('norm').checked;
+  const header=rows.shift()||[];
+  if(trim) for(let i=0;i<header.length;i++) header[i]=String(header[i]).trim();
+
+  const idxOf = (spec) => {
+    if(!spec) return -1;
+    const n=parseInt(spec,10);
+    if(!isNaN(n)) return n-1;
+    return header.findIndex(h=>String(h).trim()===spec.trim());
+  };
+  const dcol=idxOf(document.getElementById('datecol').value);
+  const kcol=idxOf(document.getElementById('keycol').value);
+
+  let droppedEmpty=0, droppedDup=0, datesFixed=0;
+  const seen=new Set(), out=[];
+  for(const r of rows){
+    if(trim) for(let i=0;i<r.length;i++) r[i]=String(r[i]??'').trim();
+    if(dropEmpty && r.every(v=>String(v).trim()==='')){ droppedEmpty++; continue; }
+    if(norm && dcol>=0 && r[dcol]!==undefined){
+      const d=normDate(r[dcol]);
+      if(d && d!==r[dcol]){ r[dcol]=d; datesFixed++; }
+    }
+    if(dedupe){
+      const k = kcol>=0 ? String(r[kcol]??'') : r.join('\u0001');
+      if(k==='') { /* 空键不去重 */ }
+      else if(seen.has(k)){ droppedDup++; continue; }
+      else seen.add(k);
+    }
+    out.push(r);
+  }
+  const width=header.length;
+  for(const r of out) while(r.length<width) r.push('');
+  lastRows=[header,...out];
+  document.getElementById('out').textContent = toCSV(lastRows);
+  document.getElementById('stats').innerHTML =
+    `原始 <b>${orig}</b> 行 → 结果 <b>${out.length}</b> 行　`+
+    `删空行 <b>${droppedEmpty}</b>　去重 <b>${droppedDup}</b>　日期修正 <b>${datesFixed}</b>　`+
+    `<span class="ok">完成</span>`;
+};
+document.getElementById('dl').onclick = () => {
+  if(!lastRows) return;
+  const blob=new Blob(["\uFEFF"+toCSV(lastRows)],{type:'text/csv;charset=utf-8'});
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(blob); a.download='cleaned.csv'; a.click();
+};
+document.getElementById('copy').onclick = async () => {
+  if(!lastRows) return;
+  await navigator.clipboard.writeText(toCSV(lastRows));
+  document.getElementById('copy').textContent='已复制';
+  setTimeout(()=>document.getElementById('copy').textContent='复制',1200);
+};
+</script>
+</body>
+</html>
