@@ -1,0 +1,190 @@
+{
+  "generated": "2026-11-23T16:14:19Z",
+  "orders": [
+    {
+      "code": "ML-EVE-01000",
+      "slug": "eventkit-lite",
+      "title": "EventKit Lite — 8-sheet event management workbook",
+      "price_usd": 12,
+      "eth": "0.004001000",
+      "wei": 4001000000000000,
+      "chain": "base",
+      "address": "0x2e63f558e2b9cfcf2e21078c6697e3221cb51e4a",
+      "files": [
+        "EventKit-Lite.xlsx"
+      ]
+    },
+    {
+      "code": "ML-WED-02000",
+      "slug": "wedding-planner",
+      "title": "Wedding Planner Workbook",
+      "price_usd": 6,
+      "eth": "0.002002000",
+      "wei": 2002000000000000,
+      "chain": "base",
+      "address": "0x2e63f558e2b9cfcf2e21078c6697e3221cb51e4a",
+      "files": [
+        "婚礼筹备模板.xlsx"
+      ]
+    },
+    {
+      "code": "ML-JOB-03000",
+      "slug": "jobfair-ops",
+      "title": "Job Fair Operations Workbook",
+      "price_usd": 6,
+      "eth": "0.002003000",
+      "wei": 2003000000000000,
+      "chain": "base",
+      "address": "0x2e63f558e2b9cfcf2e21078c6697e3221cb51e4a",
+      "files": [
+        "招聘会执行模板.xlsx"
+      ]
+    },
+    {
+      "code": "ML-SAL-04000",
+      "slug": "salon-ops",
+      "title": "Community Salon Workbook",
+      "price_usd": 6,
+      "eth": "0.002004000",
+      "wei": 2004000000000000,
+      "chain": "base",
+      "address": "0x2e63f558e2b9cfcf2e21078c6697e3221cb51e4a",
+      "files": [
+        "社群沙龙模板.xlsx"
+      ]
+    },
+    {
+      "code": "ML-BUN-05000",
+      "slug": "bundle-all",
+      "title": "Bundle — EventKit Lite + all three event workbooks",
+      "price_usd": 24,
+      "eth": "0.008005000",
+      "wei": 8005000000000000,
+      "chain": "base",
+      "address": "0x2e63f558e2b9cfcf2e21078c6697e3221cb51e4a",
+      "files": [
+        "EventKit-Lite.xlsx",
+        "婚礼筹备模板.xlsx",
+        "招聘会执行模板.xlsx",
+        "社群沙龙模板.xlsx"
+      ]
+    },
+    {
+      "code": "ML-MIN-06000",
+      "slug": "mingmerge-cli",
+      "title": "mingmerge — Excel merge / dedupe / validate CLI",
+      "price_usd": 9,
+      "eth": "0.003006000",
+      "wei": 3006000000000000,
+      "chain": "base",
+      "address": "0x2e63f558e2b9cfcf2e21078c6697e3221cb51e4a",
+      "files": [
+        "mingmerge-0.1.0.zip"
+      ]
+    },
+    {
+      "code": "ML-SVC-07667",
+      "slug": "svc-excel-clean",
+      "title": "Excel 清洗/合并/去重（一次，≤5 个文件）",
+      "price_usd": 8,
+      "eth": "0.002673667",
+      "wei": 2673667000000000,
+      "chain": "base",
+      "address": "0x2e63f558e2b9cfcf2e21078c6697e3221cb51e4a",
+      "files": [
+        "deliverable.xlsx"
+      ]
+    },
+    {
+      "code": "ML-SVC-08000",
+      "slug": "svc-formula-fix",
+      "title": "表格公式/透视表修复",
+      "price_usd": 6,
+      "eth": "0.002008000",
+      "wei": 2008000000000000,
+      "chain": "base",
+      "address": "0x2e63f558e2b9cfcf2e21078c6697e3221cb51e4a",
+      "files": [
+        "fixed.xlsx"
+      ]
+    },
+    {
+      "code": "ML-SVC-09000",
+      "slug": "svc-python-tool",
+      "title": "小工具脚本（单文件 Python CLI）",
+      "price_usd": 15,
+      "eth": "0.005009000",
+      "wei": 5009000000000000,
+      "chain": "base",
+      "address": "0x2e63f558e2b9cfcf2e21078c6697e3221cb51e4a",
+      "files": [
+        "tool.py"
+      ]
+    },
+    {
+      "code": "ML-SVC-10333",
+      "slug": "svc-chart",
+      "title": "数据图表（5 张，可直接放进报告）",
+      "price_usd": 10,
+      "eth": "0.003343333",
+      "wei": 3343333000000000,
+      "chain": "base",
+      "address": "0x2e63f558e2b9cfcf2e21078c6697e3221cb51e4a",
+      "files": [
+        "charts.png"
+      ]
+    },
+    {
+      "code": "ML-SVC-11667",
+      "slug": "svc-doc",
+      "title": "文档整理/排版（≤20 页）",
+      "price_usd": 8,
+      "eth": "0.002677667",
+      "wei": 2677667000000000,
+      "chain": "base",
+      "address": "0x2e63f558e2b9cfcf2e21078c6697e3221cb51e4a",
+      "files": [
+        "doc.docx"
+      ]
+    },
+    {
+      "code": "ML-SVC-12667",
+      "slug": "svc-automation",
+      "title": "重复劳动自动化方案（诊断+脚本）",
+      "price_usd": 20,
+      "eth": "0.006678667",
+      "wei": 6678667000000000,
+      "chain": "base",
+      "address": "0x2e63f558e2b9cfcf2e21078c6697e3221cb51e4a",
+      "files": [
+        "automation.zip"
+      ]
+    },
+    {
+      "code": "ML-SVC-13000",
+      "slug": "svc-data-report",
+      "title": "数据小报告（1–3 页结论 + 图表）",
+      "price_usd": 12,
+      "eth": "0.004013000",
+      "wei": 4013000000000000,
+      "chain": "base",
+      "address": "0x2e63f558e2b9cfcf2e21078c6697e3221cb51e4a",
+      "files": [
+        "report.pdf"
+      ]
+    },
+    {
+      "code": "ML-SVC-14667",
+      "slug": "svc-review",
+      "title": "表格/脚本复核（找出错在哪）",
+      "price_usd": 5,
+      "eth": "0.001680667",
+      "wei": 1680667000000000,
+      "chain": "base",
+      "address": "0x2e63f558e2b9cfcf2e21078c6697e3221cb51e4a",
+      "files": [
+        "review.md"
+      ]
+    }
+  ]
+}
